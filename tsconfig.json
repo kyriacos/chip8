@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es2016",
+    "lib": ["es2016", "dom"],
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "outDir": "build"
+    // "declaration": true,
+    // "outFile": "build/Chip8.js"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["build", "node_modules", "**/*.spec.ts"]
+}
