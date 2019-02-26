@@ -1,4 +1,5 @@
 import Renderer from './Renderer';
+import Beep from './Beep';
 import CPU from './CPU';
 import CanvasRenderer from './CanvasRenderer';
 import KeyMap from './KeyMap';
@@ -9,10 +10,12 @@ const D_WIDTH = 64;
 class Emulator {
   cpu: CPU;
   renderer: Renderer;
+  beep: Beep;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.cpu = new CPU(D_WIDTH, D_HEIGHT);
     this.renderer = new CanvasRenderer(canvasElem, D_WIDTH, D_HEIGHT);
+    this.beep = new Beep();
   }
 
   load(buffer: ArrayBuffer) {
@@ -46,7 +49,16 @@ class Emulator {
         this.cpu.redraw = false;
       }
 
-      this.cpu.updateTimers();
+      // this.cpu.updateTimers();
+      if (this.cpu.soundTimer > 0) {
+        this.beep.start();
+        this.cpu.soundTimer--;
+      } else {
+        this.beep.stop();
+      }
+      if (this.cpu.delayTimer > 0) {
+        this.cpu.delayTimer--;
+      }
       window.requestAnimationFrame(run);
     };
     window.requestAnimationFrame(run);
@@ -85,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
     reader.onload = () => emulator.load(<ArrayBuffer>reader.result);
     reader.readAsArrayBuffer(file);
   };
+
   const keys = KeyMap.getKeyMap();
   for (let key in keys) {
     document.getElementById('keys').innerHTML += `<span id="${keys[key]}">${key}</span>`;
