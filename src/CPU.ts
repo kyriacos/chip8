@@ -168,6 +168,17 @@ export default class CPU {
     // increment the program counter by 2 since every instruction is 2 bytes long
     this.PC += 2;
 
+    // console.table({
+    //   X: x.toString(16),
+    //   Y: y.toString(16),
+    //   VX: this.V[x].toString(16),
+    //   VY: this.V[y].toString(16),
+    //   PC: this.PC.toString(16),
+    //   SP: this.SP.toString(16),
+    //   OPCODE: opcode.toString(16)
+    //   // STACK: this.stack.forEach(x => ),
+    // });
+
     // grab the first nibble for the opcode (4bits)
     switch (opcode & 0xF000) {
       case 0x0000:

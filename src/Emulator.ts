@@ -11,11 +11,15 @@ class Emulator {
   cpu: CPU;
   renderer: Renderer;
   beep: Beep;
+  running: boolean;
+  stepCount: number;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.cpu = new CPU(D_WIDTH, D_HEIGHT);
     this.renderer = new CanvasRenderer(canvasElem, D_WIDTH, D_HEIGHT);
     this.beep = new Beep();
+    this.running = false;
+    this.stepCount = -1;
   }
 
   load(buffer: ArrayBuffer) {
@@ -25,46 +29,62 @@ class Emulator {
     this.start();
   }
 
-  reset() {
+  reset(): void {
     this.cpu.reset();
     this.renderer.reset();
   }
 
-  getCpu() {
-    return this.cpu;
-  }
-
-  fullscreen(): void {
-    this.renderer.fullscreen();
+  isRunning(): boolean {
+    return this.running;
   }
 
   start() {
+    this.running = true;
     const run = () => {
-      for (let i = 0; i < 10; i++) {
-        this.cpu.runCycle();
-      }
+      const emulate = (count = 10) => {
+        for (let i = 0; i < count; i++) {
+          this.cpu.runCycle();
+        }
 
-      if (this.cpu.redraw) {
-        (<CanvasRenderer>this.renderer).render(this.cpu.video);
-        this.cpu.redraw = false;
-      }
+        if (this.cpu.redraw) {
+          (<CanvasRenderer>this.renderer).render(this.cpu.video);
+          this.cpu.redraw = false;
+        }
 
-      // this.cpu.updateTimers();
-      if (this.cpu.soundTimer > 0) {
-        this.beep.start();
-        this.cpu.soundTimer--;
-      } else {
-        this.beep.stop();
-      }
-      if (this.cpu.delayTimer > 0) {
-        this.cpu.delayTimer--;
+        // this.cpu.updateTimers();
+        if (this.cpu.soundTimer > 0) {
+          this.beep.start();
+          this.cpu.soundTimer--;
+        } else {
+          this.beep.stop();
+        }
+        if (this.cpu.delayTimer > 0) {
+          this.cpu.delayTimer--;
+        }
+      };
+      if (this.isRunning()) {
+        emulate();
+      } else if (this.stepCount > 0) {
+        emulate(this.stepCount);
+        this.stepCount--;
       }
       window.requestAnimationFrame(run);
     };
     window.requestAnimationFrame(run);
   }
 
-  stop() {}
+  toggleRun() {
+    this.running = !this.running;
+  }
+
+  step(): void {
+    this.running = false;
+    this.stepCount++;
+  }
+
+  fullscreen(): void {
+    this.renderer.fullscreen();
+  }
 }
 
 // if (this.timer) {
@@ -82,7 +102,7 @@ class Emulator {
 //   this.soundTimer = Math.max(0, this.soundTimer - 1);
 // }, 16);
 
-document.addEventListener('DOMContentLoaded', function() {
+function init() {
   const canvasElem = document.getElementsByTagName('canvas')[0];
   const emulator = new Emulator(canvasElem);
   const cpu = emulator.cpu;
@@ -126,4 +146,18 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fullscreen').onclick = function() {
     emulator.fullscreen();
   };
+
+  document.getElementById('pause').onclick = function(evt) {
+    emulator.toggleRun();
+    (<HTMLElement>evt.target).innerText = emulator.isRunning() ? 'Pause' : 'Play';
+  };
+
+  document.getElementById('step').onclick = function(evt) {
+    emulator.step();
+    document.getElementById('pause').innerText = 'Play';
+  };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  init();
 });
