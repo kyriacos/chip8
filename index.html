@@ -6,6 +6,11 @@
     <title>Simple Chip-8 Emulator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      @font-face {
+        font-family: 'Visitor';
+        src: url('visitor1.ttf') format('truetype');
+      }
+
       pre {
         height: 500px;
         width: 500px;
@@ -13,24 +18,138 @@
       }
 
       canvas {
+        margin: 0 auto;
+        border: 5px solid #666;
         display: block;
-        margin: 5px;
         background: #000;
         image-rendering: pixelated;
+      }
+
+      html,
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        margin: 0;
+        height: 100%;
+      }
+
+      body {
+        background: #333;
+        color: white;
+        padding: 10px;
+        margin: 0;
+        height: 100%;
+        display: grid;
+        grid-template-columns: [col1] 25% [col2] auto [col3] 25% [end];
+        grid-template-rows: [row1] auto [row1-end row2] auto [row2-end row3] 50% [end];
+        grid-template-areas:
+          'controls controls controls'
+          'keypad emulator .'
+          'debugger debugger debugger';
+
+        grid-gap: 10px 10px;
+        overflow: hidden;
+      }
+
+      grid-item {
+        background-color: lightgreen;
+      }
+
+      #controls {
+        /* grid-row: row1;
+        grid-column: col2; */
+        grid-area: controls;
+        margin: 0 auto;
+      }
+
+      #emulator {
+        grid-area: emulator;
+        /* grid-row: row2;
+        grid-column: col2; */
+      }
+
+      #keypad {
+        /* grid-row: row2;
+        grid-column: col1; */
+        grid-area: keypad;
+        margin: 0 auto;
+      }
+
+      #keys {
+        display: grid;
+        grid-template-rows: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 1fr;
+        width: inherit;
+        height: inherit;
+        margin-top: 20px;
+        font-family: 'Visitor';
+        color: #222;
+        border: 5px solid #666;
+      }
+
+      #keys div {
+        border: 2px solid #666;
+        width: 40px;
+        height: 40px;
+        background: #eaeaea;
+        font-size: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        text-transform: uppercase;
+      }
+
+      #debugger {
+        border: 5px solid #666;
+        /* margin-top: 3px; */
+        /* grid-row-start: row3;
+        grid-row-end: end;
+        grid-column-start: col1;
+        grid-column-end: end; */
+        grid-area: debugger;
+        display: grid;
+        grid-template: 'dissasm dissasm registers';
+      }
+
+      #dissasm {
+        grid-area: dissasm;
+        border-right: 5px solid #666;
+        /* grid-column-start: col1;
+        grid-column-end: col3; */
+      }
+
+      #registers {
+        grid-area: registers;
+        /* grid-column-start: col3;
+        grid-column-end: end; */
       }
     </style>
   </head>
   <body>
     <div id="file-content"></div>
-    <input type="file" id="file-input" />
-    <input type="button" id="btnLoad" value="Load" />
-    <button id="fullscreen">Go fullscreen</button>
-    <button id="pause">Pause</button>
-    <button id="step">Step</button>
+    <div id="controls">
+      <input type="file" id="file-input" />
+      <input type="button" id="btnLoad" value="Load" />
+      <button id="fullscreen">Go fullscreen</button>
+      <button id="pause">Pause</button>
+      <button id="step">Step</button>
+    </div>
+    <div id="keypad">
+      <div id="keys"></div>
+    </div>
 
-    <canvas></canvas>
-    <pre></pre>
-    <div id="keys"></div>
+    <div id="emulator">
+      <canvas></canvas>
+    </div>
+
+    <div id="debugger">
+      <div id="dissasm"></div>
+      <div id="registers"></div>
+    </div>
 
     <script src="./build/bundle.js"></script>
   </body>

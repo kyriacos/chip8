@@ -41,7 +41,7 @@ class Emulator {
   start() {
     this.running = true;
     const run = () => {
-      const emulate = (count = 10) => {
+      const emulate = (count: number = 10) => {
         for (let i = 0; i < count; i++) {
           this.cpu.runCycle();
         }
@@ -120,9 +120,9 @@ function init() {
 
   const keys = KeyMap.getKeyMap();
   for (let key in keys) {
-    document.getElementById('keys').innerHTML += `<span id="${keys[key]}">${key}</span>`;
+    document.getElementById('keys').innerHTML += `<div id="${keys[key]}">${key}</div>`;
   }
-  const spans = document.querySelectorAll<HTMLElement>('#keys span');
+  const spans = document.querySelectorAll<HTMLElement>('#keys div');
   spans.forEach(span => {
     span.onclick = function(evt) {
       cpu.setKey(parseInt((<HTMLElement>evt.target).id, 16));

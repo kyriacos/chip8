@@ -13,7 +13,11 @@ export default class Dissassembler {
     let output = `${(0x0200 + pc)
       .toString(16)
       .padStart(4, '0')
+      .toUpperCase()}: \t ${opcode
+      .toString(16)
+      .padStart(4, '0')
       .toUpperCase()}\t`;
+
     // grab the first nibble for the opcode (4bits)
     switch (opcode & 0xF000) {
       case 0x0000:
