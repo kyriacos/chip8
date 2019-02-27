@@ -34,10 +34,6 @@
 		+---------------+= 0x000 (0) Start of Chip-8 RAM
 	*/
 
-// const fs = require('fs');
-// const stdin = process.stdin;
-// const rom = fs.readFileSync('./maze.ch8');
-
 // prettier-ignore
 const FONTSET = new Uint8Array([
   0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
