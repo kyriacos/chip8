@@ -15,6 +15,7 @@ class Emulator {
   running: boolean;
   stepCount: number;
   debuggerElem: HTMLElement;
+  debugAddress: number;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.cpu = new CPU(D_WIDTH, D_HEIGHT);
@@ -30,6 +31,7 @@ class Emulator {
 
     const rom = new Uint8Array(buffer);
     this.cpu.loadRom(rom);
+    this.debugAddress = this.cpu.getPC();
     this.start();
   }
 
@@ -43,19 +45,29 @@ class Emulator {
   }
 
   displayInstructions(pc: number) {
-    let address: number = pc - 2;
     const memory = this.cpu.getMemory();
-
     let output: Array<String> = [];
-    for (let i = 0; i < 38; i += 2) {
-      const decoded = Dissassembler.decode(memory, address + i, 0);
+    const numberOfBytes = 24; // 12 lines
+
+    if (
+      this.debugAddress <= pc - numberOfBytes ||
+      this.debugAddress >= pc - 2 ||
+      (this.debugAddress & 1) != (pc & 1)
+    ) {
+      this.debugAddress = pc - 2;
+    }
+
+    for (let i = 0; i < numberOfBytes; i += 2) {
+      const decoded = Dissassembler.decode(memory, this.debugAddress + i, 0);
       const matches = decoded.match(/(\w+):\t(.*)/);
       const addr = `<span>${matches[1] || ''}</span>`;
       const instr = `<span>${matches[2] || ''}</span>`;
 
       output = [
         ...output,
-        `<div class="pc-${address} ${address + i === pc ? ' active' : ''}">${addr + instr}</div>`
+        `<div class="pc-${this.debugAddress} ${
+          this.debugAddress + i === pc ? ' active' : ''
+        }">${addr + instr}</div>`
       ];
     }
     this.debuggerElem.innerHTML = output.join('');

@@ -99,7 +99,8 @@ grid-item {
 #dissasm {
   grid-area: dissasm;
   border-right: 5px solid #666;
-  overflow-y: scroll;
+  margin: auto 0;
+  /* overflow-y: scroll; */
 }
 
 #registers {
