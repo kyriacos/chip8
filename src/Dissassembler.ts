@@ -11,7 +11,37 @@ export default class Dissassembler {
 
     const kk = `0x${toHexString(opcode & 0xff)}`;
 
-    let output = `${toPaddedHexString(pc + startPC)}:\t`;
+    let bitdiagram = () => {
+      const upperBits = (rom[pc] || '').toString(2).padStart(8, '0');
+      const lowerBits = (rom[pc + 1] || '').toString(2).padStart(8, '0');
+
+      const patternFn = (upperBit: string, lowerBit: string) => {
+        const fullblock = '\u2588';
+        const upperblock = '\u2580';
+        const lowerblock = '\u2584';
+        const space = ' ';
+        const pattern = upperBit + lowerBit;
+        switch (pattern) {
+          case '11':
+            return fullblock;
+          case '10':
+            return upperblock;
+          case '01':
+            return lowerblock;
+          default:
+            return space;
+        }
+      };
+      let output = '';
+      for (let i = 0; i < 8; i++) {
+        output += patternFn(upperBits[i], lowerBits[i]);
+      }
+      return output;
+    };
+
+    // let ascii = bitdiagram();
+
+    let output = `${toPaddedHexString(pc + startPC)}:\t ${toHexString(opcode)}\t`;
     // ${opcode
     //   .toString(16)
     //   .padStart(4, '0')
@@ -27,6 +57,8 @@ export default class Dissassembler {
           case 0x00ee: // RET
             output += 'RET';
             break;
+          default:
+            output += `SYS ${nnn}`;
         }
         break;
       case 0x1000: // 1nnn - JP addr
@@ -145,6 +177,9 @@ export default class Dissassembler {
       default:
         output = `0x${opcode.toString(16)} NOT IMPLEMENTED`;
     }
+
+    output = output.padEnd(30);
+    // output += `\t${ascii}`;
 
     return output;
   }

@@ -60,8 +60,8 @@ class Emulator {
     for (let i = 0; i < numberOfBytes; i += 2) {
       const decoded = Dissassembler.decode(memory, this.debugAddress + i, 0);
       const matches = decoded.match(/(\w+):\t(.*)/);
-      const addr = `<span>${matches[1] || ''}</span>`;
-      const instr = `<span>${matches[2] || ''}</span>`;
+      const addr = `<pre>${matches[1] || ''}</pre>`;
+      const instr = `<pre>${matches[2] || ''}</pre>`;
 
       output = [
         ...output,
@@ -73,30 +73,40 @@ class Emulator {
     this.debuggerElem.innerHTML = output.join('');
   }
 
+  displayRegisters() {
+    const registerElem = document.getElementById('registers');
+    const registers = this.cpu.getRegisters();
+    const html = Object.entries(registers).reduce(
+      (m, [key, value]) => (m += `<div><span>${key}:</span><span>${value}</span></div>`),
+      ''
+    );
+    registerElem.innerHTML = html;
+  }
+
   start() {
     this.running = true;
     const run = () => {
       const emulate = (count: number = 10) => {
         for (let i = 0; i < count; i++) {
           this.cpu.runCycle();
+        }
+        this.displayInstructions(this.cpu.getPC());
+        this.displayRegisters();
 
-          this.displayInstructions(this.cpu.getPC());
+        if (this.cpu.redraw) {
+          (<CanvasRenderer>this.renderer).render(this.cpu.video);
+          this.cpu.redraw = false;
+        }
 
-          if (this.cpu.redraw) {
-            (<CanvasRenderer>this.renderer).render(this.cpu.video);
-            this.cpu.redraw = false;
-          }
-
-          // this.cpu.updateTimers();
-          if (this.cpu.soundTimer > 0) {
-            this.beep.start();
-            this.cpu.soundTimer--;
-          } else {
-            this.beep.stop();
-          }
-          if (this.cpu.delayTimer > 0) {
-            this.cpu.delayTimer--;
-          }
+        // this.cpu.updateTimers();
+        if (this.cpu.soundTimer > 0) {
+          this.beep.start();
+          this.cpu.soundTimer--;
+        } else {
+          this.beep.stop();
+        }
+        if (this.cpu.delayTimer > 0) {
+          this.cpu.delayTimer--;
         }
       };
       if (this.isRunning()) {

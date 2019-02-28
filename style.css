@@ -3,10 +3,9 @@
   src: url('visitor1.ttf') format('truetype');
 }
 
-pre {
-  height: 500px;
-  width: 500px;
-  border: 1px solid #000;
+@font-face {
+  font-family: 'Apple 2';
+  src: url('Apple ][.ttf') format('truetype');
 }
 
 canvas {
@@ -90,21 +89,39 @@ grid-item {
 }
 
 #debugger {
-  border: 5px solid #666;
   grid-area: debugger;
   display: grid;
-  grid-template: 'dissasm dissasm registers';
+  grid-template-areas: 'dissasm registers';
+  grid-gap: 10px;
+  padding: 2px;
+  border: 5px solid #666;
+  background: #666;
+  font-family: 'Apple 2';
+  font-size: 13px;
 }
 
 #dissasm {
   grid-area: dissasm;
-  border-right: 5px solid #666;
-  margin: auto 0;
-  /* overflow-y: scroll; */
+  background: #333;
 }
 
 #registers {
+  background: #333;
   grid-area: registers;
+  flex-wrap: wrap;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-transform: uppercase;
+}
+
+#registers div {
+  padding: 4px;
+}
+
+#registers div span:first-child {
+  margin-right: 4px;
+  color: #a5a5a5;
 }
 
 #dissasm div {
@@ -112,8 +129,6 @@ grid-item {
   grid-template-columns: 10% auto;
   grid-template-areas: 'address instruction';
   grid-column-gap: 20px;
-  font-family: 'Visitor';
-  font-size: 18px;
   padding: 4px;
 }
 
@@ -121,10 +136,17 @@ grid-item {
   background-color: green;
 }
 
-#dissasm div span:first-child {
-  grid-area: address;
+#dissasm pre {
+  margin: 0;
+  padding: 0;
+  font-family: 'Apple 2';
 }
 
-#dissasm div span:nth-child(2) {
+#dissasm div pre:first-child {
+  grid-area: address;
+  color: #a5a5a5;
+}
+
+#dissasm div pre:nth-child(2) {
   grid-area: instruction;
 }

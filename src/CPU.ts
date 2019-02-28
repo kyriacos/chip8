@@ -1,3 +1,5 @@
+import { toPaddedHexString, toHexString } from './utils';
+
 /*
 		http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
 
@@ -158,15 +160,18 @@ export default class CPU {
 
   getRegisters() {
     const vRegisters = this.V.reduce(
-      (m, a, i) => ({ ...m, [`V${i.toString(16).toUpperCase()}`]: a.toString(16) }),
+      (m, a, i) => ({ ...m, [`V${toHexString(i)}`]: toHexString(a) }),
       {}
     );
+
+    const f = (v: number) => toHexString(v); //`0x${toHexString(v)}`;
+
     return {
-      I: this.I,
-      PC: this.PC,
-      SP: this.SP,
-      DT: this.delayTimer,
-      ST: this.soundTimer,
+      I: f(this.I),
+      PC: f(this.PC),
+      SP: f(this.SP),
+      DT: f(this.delayTimer),
+      ST: f(this.soundTimer),
       ...vRegisters
     };
   }
@@ -181,8 +186,8 @@ export default class CPU {
 
   runCycle(): void {
     const opcode = (this.memory[this.PC] << 8) | this.memory[this.PC + 1];
-    const x = (opcode & 0x0F00) >> 8;
-    const y = (opcode & 0x00F0) >> 4;
+    const x = (opcode & 0x0f00) >> 8;
+    const y = (opcode & 0x00f0) >> 4;
 
     // increment the program counter by 2 since every instruction is 2 bytes long
     this.PC += 2;
@@ -199,36 +204,36 @@ export default class CPU {
     // });
 
     // grab the first nibble for the opcode (4bits)
-    switch (opcode & 0xF000) {
+    switch (opcode & 0xf000) {
       case 0x0000:
         switch (opcode) {
-          case 0x00E0: // CLS
+          case 0x00e0: // CLS
             for (let i = 0; i < this.video.length; i++) {
               this.video[i] = 0;
             }
             this.redraw = true;
             break;
-          case 0x00EE: // RET
+          case 0x00ee: // RET
             this.SP--;
             this.PC = this.stack[this.SP];
             break;
         }
         break;
       case 0x1000: // 1nnn - JP addr
-        this.PC = opcode & 0x0FFF;
+        this.PC = opcode & 0x0fff;
         break;
       case 0x2000: // 2nnn - CALL addr
         this.stack[this.SP] = this.PC;
         this.SP++;
-        this.PC = opcode & 0x0FFF; // nnn
+        this.PC = opcode & 0x0fff; // nnn
         break;
       case 0x3000: // 3xkk - SE Vx, byte
-        if (this.V[x] === (opcode & 0x00FF)) {
+        if (this.V[x] === (opcode & 0x00ff)) {
           this.PC += 2;
         }
         break;
       case 0x4000: // 4xkk - SNE Vx, byte
-        if (this.V[x] !== (opcode & 0x00FF)) {
+        if (this.V[x] !== (opcode & 0x00ff)) {
           this.PC += 2;
         }
         break;
@@ -238,14 +243,14 @@ export default class CPU {
         }
         break;
       case 0x6000: // 6xkk - LD Vx, byte
-        this.V[x] = opcode & 0xFF; // 0xFF same as 0x00FF = 255
+        this.V[x] = opcode & 0xff; // 0xFF same as 0x00FF = 255
         break;
       case 0x7000: // 7xkk - ADD Vx, byte
-        this.V[x] = (opcode & 0xFF) + this.V[x];
+        this.V[x] = (opcode & 0xff) + this.V[x];
         break;
       case 0x8000:
         switch (
-          opcode & 0x000F // get lower nibble
+          opcode & 0x000f // get lower nibble
         ) {
           case 0x0000: // 8xy0 - LD Vx, Vy
             this.V[x] = this.V[y];
@@ -260,26 +265,26 @@ export default class CPU {
             this.V[x] = this.V[x] ^ this.V[y];
             break;
           case 0x0004: // 8xy4 - ADD Vx, Vy
-            this.V[0xF] = this.V[x] + this.V[y] > 255 ? 0x1 : 0x0; // 1 or 0
+            this.V[0xf] = this.V[x] + this.V[y] > 255 ? 0x1 : 0x0; // 1 or 0
             this.V[x] += this.V[y];
             break;
           case 0x0005: // 8xy5 - SUB Vx, Vy
-            this.V[0xF] = this.V[x] > this.V[y] ? 0x1 : 0x0;
+            this.V[0xf] = this.V[x] > this.V[y] ? 0x1 : 0x0;
             this.V[x] -= this.V[y];
             break;
           case 0x0006: // 8xy6 - SHR Vx {, Vy}
             // this.V[0xF] = this.V[x] & 0xF; // set to LSB
-            this.V[0xF] = this.V[y] & 0x1; // set to LSB if its 1
+            this.V[0xf] = this.V[y] & 0x1; // set to LSB if its 1
             // this.V[x] = this.V[y] >> 1;
             this.V[x] = this.V[x] >> 1;
             break;
           case 0x0007: // 8xy7 - SUBN Vx, Vy
-            this.V[0xF] = this.V[y] > this.V[x] ? 0x1 : 0x0;
+            this.V[0xf] = this.V[y] > this.V[x] ? 0x1 : 0x0;
             this.V[x] = this.V[y] - this.V[x];
             break;
-          case 0x000E: // 8xyE - SHL Vx {, Vy}
+          case 0x000e: // 8xyE - SHL Vx {, Vy}
             // this.V[0xF] = (this.V[x] >> 7) & 0xF; // set to MSB
-            this.V[0xF] = (this.V[y] >> 7) & 0x1; // set to MSB (1 or 0)
+            this.V[0xf] = (this.V[y] >> 7) & 0x1; // set to MSB (1 or 0)
             // this.V[x] = this.V[y] << 1;
             this.V[x] = this.V[x] << 1;
             break;
@@ -290,20 +295,20 @@ export default class CPU {
           this.PC += 2;
         }
         break;
-      case 0xA000: // Annn - LD I, addr
-        this.I = opcode & 0x0FFF;
+      case 0xa000: // Annn - LD I, addr
+        this.I = opcode & 0x0fff;
         break;
-      case 0xB000: // Bnnn - JP V0, addr
-        this.PC = (opcode & 0x0FFF) + this.V[x];
+      case 0xb000: // Bnnn - JP V0, addr
+        this.PC = (opcode & 0x0fff) + this.V[x];
         break;
-      case 0xC000: // Cxkk - RND Vx, byte
-        this.V[x] = Math.floor(Math.random() * 0xFF) & (opcode & 0xFF);
+      case 0xc000: // Cxkk - RND Vx, byte
+        this.V[x] = Math.floor(Math.random() * 0xff) & (opcode & 0xff);
         break;
-      case 0xD000:
+      case 0xd000:
         // Dxyn - DRW Vx, Vy, nybble
 
-        this.V[0xF] = 0;
-        const height = opcode & 0x000F;
+        this.V[0xf] = 0;
+        const height = opcode & 0x000f;
         for (let yLine = 0; yLine < height; yLine++) {
           const sprite = this.memory[this.I + yLine];
 
@@ -318,35 +323,35 @@ export default class CPU {
             // console.log(`sprite: ${sprite.toString(2)} - pixel: ${pixel.toString(2)}`);
             if (pixel > 0) {
               const newPixel = this.setPixel(xC, yC);
-              if (newPixel !== 1) this.V[0xF] = 1;
+              if (newPixel !== 1) this.V[0xf] = 1;
             }
           }
         }
         this.redraw = true;
         break;
 
-      case 0xE000:
+      case 0xe000:
         switch (
-          opcode & 0x00FF // last byte
+          opcode & 0x00ff // last byte
         ) {
-          case 0x009E: // Ex9E - SKP Vx
+          case 0x009e: // Ex9E - SKP Vx
             if (this.keys[this.V[x]]) {
               this.PC += 2;
             }
             break;
-          case 0x00A1: // ExA1 - SKNP Vx
+          case 0x00a1: // ExA1 - SKNP Vx
             if (!this.keys[this.V[x]]) {
               this.PC += 2;
             }
             break;
         }
         break;
-      case 0xF000:
-        switch (opcode & 0x00FF) {
+      case 0xf000:
+        switch (opcode & 0x00ff) {
           case 0x0007: // Fx07 - LD Vx, DT
             this.V[x] = this.delayTimer;
             break;
-          case 0x000A: // Fx0A - LD Vx, K
+          case 0x000a: // Fx0A - LD Vx, K
             // run infinite loop until we receive a key?
             let wait = true;
             while (wait) {
@@ -363,7 +368,7 @@ export default class CPU {
           case 0x0018: // Fx18 - LD ST, Vx
             this.soundTimer = this.V[x];
             break;
-          case 0x001E: // Fx1E - ADD I, Vx
+          case 0x001e: // Fx1E - ADD I, Vx
             this.I = this.I + this.V[x];
             break;
           case 0x0029: // Fx29 - LD F, Vx
