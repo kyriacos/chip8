@@ -130,7 +130,7 @@ export default class CPU {
 
   getKeyPressed(): number {
     for (let i = 0; i < this.keys.length; i++) {
-      if (this.keys[i]) i;
+      if (this.keys[i]) return i;
     }
     return -1;
   }
