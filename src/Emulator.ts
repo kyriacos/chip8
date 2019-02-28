@@ -3,6 +3,7 @@ import Beep from './Beep';
 import CPU from './CPU';
 import CanvasRenderer from './CanvasRenderer';
 import KeyMap from './KeyMap';
+import Dissassembler from './Dissassembler';
 
 const D_HEIGHT = 32;
 const D_WIDTH = 64;
@@ -13,6 +14,7 @@ class Emulator {
   beep: Beep;
   running: boolean;
   stepCount: number;
+  debuggerElem: HTMLElement;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.cpu = new CPU(D_WIDTH, D_HEIGHT);
@@ -20,12 +22,14 @@ class Emulator {
     this.beep = new Beep();
     this.running = false;
     this.stepCount = -1;
+    this.debuggerElem = document.getElementById('dissasm');
   }
 
   load(buffer: ArrayBuffer) {
     this.reset();
 
-    this.cpu.loadRom(new Uint8Array(buffer));
+    const rom = new Uint8Array(buffer);
+    this.cpu.loadRom(rom);
     this.start();
   }
 
@@ -38,28 +42,49 @@ class Emulator {
     return this.running;
   }
 
+  displayInstructions(pc: number) {
+    let address: number = pc - 2;
+    const memory = this.cpu.getMemory();
+
+    let output: Array<String> = [];
+    for (let i = 0; i < 38; i += 2) {
+      const decoded = Dissassembler.decode(memory, address + i, 0);
+      const matches = decoded.match(/(\w+):\t(.*)/);
+      const addr = `<span>${matches[1] || ''}</span>`;
+      const instr = `<span>${matches[2] || ''}</span>`;
+
+      output = [
+        ...output,
+        `<div class="pc-${address} ${address + i === pc ? ' active' : ''}">${addr + instr}</div>`
+      ];
+    }
+    this.debuggerElem.innerHTML = output.join('');
+  }
+
   start() {
     this.running = true;
     const run = () => {
       const emulate = (count: number = 10) => {
         for (let i = 0; i < count; i++) {
           this.cpu.runCycle();
-        }
 
-        if (this.cpu.redraw) {
-          (<CanvasRenderer>this.renderer).render(this.cpu.video);
-          this.cpu.redraw = false;
-        }
+          this.displayInstructions(this.cpu.getPC());
 
-        // this.cpu.updateTimers();
-        if (this.cpu.soundTimer > 0) {
-          this.beep.start();
-          this.cpu.soundTimer--;
-        } else {
-          this.beep.stop();
-        }
-        if (this.cpu.delayTimer > 0) {
-          this.cpu.delayTimer--;
+          if (this.cpu.redraw) {
+            (<CanvasRenderer>this.renderer).render(this.cpu.video);
+            this.cpu.redraw = false;
+          }
+
+          // this.cpu.updateTimers();
+          if (this.cpu.soundTimer > 0) {
+            this.beep.start();
+            this.cpu.soundTimer--;
+          } else {
+            this.beep.stop();
+          }
+          if (this.cpu.delayTimer > 0) {
+            this.cpu.delayTimer--;
+          }
         }
       };
       if (this.isRunning()) {

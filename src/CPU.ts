@@ -156,6 +156,29 @@ export default class CPU {
     return this.video;
   }
 
+  getRegisters() {
+    const vRegisters = this.V.reduce(
+      (m, a, i) => ({ ...m, [`V${i.toString(16).toUpperCase()}`]: a.toString(16) }),
+      {}
+    );
+    return {
+      I: this.I,
+      PC: this.PC,
+      SP: this.SP,
+      DT: this.delayTimer,
+      ST: this.soundTimer,
+      ...vRegisters
+    };
+  }
+
+  getPC() {
+    return this.PC;
+  }
+
+  getMemory() {
+    return this.memory;
+  }
+
   runCycle(): void {
     const opcode = (this.memory[this.PC] << 8) | this.memory[this.PC + 1];
     const x = (opcode & 0x0F00) >> 8;

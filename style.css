@@ -1,0 +1,129 @@
+@font-face {
+  font-family: 'Visitor';
+  src: url('visitor1.ttf') format('truetype');
+}
+
+pre {
+  height: 500px;
+  width: 500px;
+  border: 1px solid #000;
+}
+
+canvas {
+  margin: 0 auto;
+  border: 5px solid #666;
+  display: block;
+  background: #000;
+  image-rendering: pixelated;
+}
+
+html,
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: #333;
+  color: white;
+  padding: 10px;
+  margin: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: [col1] 25% [col2] auto [col3] 25% [end];
+  grid-template-rows: [row1] auto [row1-end row2] auto [row2-end row3] 50% [end];
+  grid-template-areas:
+    'controls controls controls'
+    'keypad emulator .'
+    'debugger debugger debugger';
+
+  grid-gap: 10px 10px;
+  overflow: hidden;
+}
+
+grid-item {
+  background-color: lightgreen;
+}
+
+#controls {
+  grid-area: controls;
+  margin: 0 auto;
+}
+
+#emulator {
+  grid-area: emulator;
+}
+
+#keypad {
+  grid-area: keypad;
+  margin: 0 auto;
+}
+
+#keys {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  width: inherit;
+  height: inherit;
+  margin-top: 20px;
+  font-family: 'Visitor';
+  color: #222;
+  border: 5px solid #666;
+}
+
+#keys div {
+  border: 2px solid #666;
+  width: 40px;
+  height: 40px;
+  background: #eaeaea;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  text-transform: uppercase;
+}
+
+#debugger {
+  border: 5px solid #666;
+  grid-area: debugger;
+  display: grid;
+  grid-template: 'dissasm dissasm registers';
+}
+
+#dissasm {
+  grid-area: dissasm;
+  border-right: 5px solid #666;
+  overflow-y: scroll;
+}
+
+#registers {
+  grid-area: registers;
+}
+
+#dissasm div {
+  display: grid;
+  grid-template-columns: 10% auto;
+  grid-template-areas: 'address instruction';
+  grid-column-gap: 20px;
+  font-family: 'Visitor';
+  font-size: 18px;
+  padding: 4px;
+}
+
+#dissasm div.active {
+  background-color: green;
+}
+
+#dissasm div span:first-child {
+  grid-area: address;
+}
+
+#dissasm div span:nth-child(2) {
+  grid-area: instruction;
+}
