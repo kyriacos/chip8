@@ -37,7 +37,7 @@ body {
   grid-template-rows: [row1] auto [row1-end row2] auto [row2-end row3] 50% [end];
   grid-template-areas:
     'controls controls controls'
-    'keypad emulator .'
+    'keypad emulator breakpoints'
     'debugger debugger debugger';
 
   grid-gap: 10px 10px;
@@ -60,6 +60,45 @@ grid-item {
 #keypad {
   grid-area: keypad;
   margin: 0 auto;
+}
+
+#breakpoints {
+  grid-area: breakpoints;
+  border: 5px solid #666;
+  overflow: hidden;
+}
+
+#breakpoints > div:first-child {
+  background: #666;
+  font-family: 'Visitor';
+  padding: 4px 10px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+#breakpoints .list {
+  font-family: 'Apple 2';
+  height: 100%;
+  overflow-y: scroll;
+}
+
+#breakpoints .list div {
+  /* display: flex; */
+  padding: 4px;
+}
+
+[contenteditable='true'].single-line {
+  white-space: nowrap;
+  /* width: 200px; */
+  overflow: hidden;
+}
+[contenteditable='true'].single-line br {
+  display: none;
+}
+[contenteditable='true'].single-line * {
+  display: inline;
+  white-space: nowrap;
 }
 
 #keys {
@@ -86,6 +125,7 @@ grid-item {
   justify-content: center;
   padding: 4px;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 #debugger {

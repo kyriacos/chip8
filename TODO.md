@@ -4,8 +4,8 @@ TODO:
 [] extract keyboard input
 [X] add pause
 [X] add STEP to step through the program
-[] add debug output flag
-[] make pretty interface
-[] add disasm
+[X] add debug output flag
+[X] make pretty interface
+[X] add disasm
 [] add FPS
 [] static or dynarec

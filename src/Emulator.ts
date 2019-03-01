@@ -16,6 +16,7 @@ class Emulator {
   stepCount: number;
   debuggerElem: HTMLElement;
   debugAddress: number;
+  breakpoints: any;
 
   constructor(canvasElem: HTMLCanvasElement) {
     this.cpu = new CPU(D_WIDTH, D_HEIGHT);
@@ -23,6 +24,7 @@ class Emulator {
     this.beep = new Beep();
     this.running = false;
     this.stepCount = -1;
+    this.breakpoints = {};
     this.debuggerElem = document.getElementById('dissasm');
   }
 
@@ -83,13 +85,32 @@ class Emulator {
     registerElem.innerHTML = html;
   }
 
+  addBreakpoint(addr: string) {
+    this.breakpoints[addr.toLowerCase()] = true;
+  }
+
   start() {
     this.running = true;
     const run = () => {
+      const addBreakpoints = () => {
+        this.breakpoints = {}; // clear the breakpoints every time in case there are new ones
+        const arr = document.querySelectorAll('#breakpoints .list span.addr');
+        arr.forEach((e: HTMLElement) => {
+          // only add if its at least a valid number in base 16
+          const addr = e.innerText;
+          if (parseInt(addr, 16)) {
+            this.addBreakpoint(addr);
+          }
+        });
+      };
+
       const emulate = (count: number = 10) => {
+        addBreakpoints();
+
         for (let i = 0; i < count; i++) {
           this.cpu.runCycle();
         }
+
         this.displayInstructions(this.cpu.getPC());
         this.displayRegisters();
 
@@ -109,6 +130,11 @@ class Emulator {
           this.cpu.delayTimer--;
         }
       };
+
+      if (this.breakpoints[this.cpu.getPC().toString(16)]) {
+        this.running = false;
+      }
+
       if (this.isRunning()) {
         emulate();
       } else if (this.stepCount > 0) {
@@ -202,6 +228,15 @@ function init() {
   document.getElementById('step').onclick = function(evt) {
     emulator.step();
     document.getElementById('pause').innerText = 'Play';
+  };
+
+  (<HTMLElement>document.querySelector('#breakpoints .add')).onclick = function() {
+    (<HTMLElement>document.querySelector('#breakpoints .list')).innerHTML += `
+        <div>
+          <span>0x</span>
+          <span contenteditable="true" class="addr single-line">nnnn</span>
+        </div>
+    `;
   };
 }
 
