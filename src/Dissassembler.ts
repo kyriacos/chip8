@@ -1,6 +1,33 @@
 import { toHexString, toPaddedHexString } from './utils';
 
+// const bitPattern: any = {
+//   '11': '\u2588', // fullblock
+//   '10': '\u2580', // upperblock
+//   '01': '\u2584' // lowerblock
+// };
+function bitDiagram(opcode: number): string {
+  const upperBits = (opcode >> 8).toString(2).padStart(8, '0');
+  const lowerBits = (opcode & 0x00ff).toString(2).padStart(8, '0');
+
+  // prettier-ignore
+  const bitPattern = (upperBit: string, lowerBit: string) => {
+    switch (upperBit + lowerBit) {
+        case '11': return '\u2588'; // fullblock
+        case '10': return '\u2580'; // upperblock
+        case '01': return '\u2584'; // lowerblock
+        default: return ' '; // space/empty
+      }
+  };
+
+  let output = '';
+  for (let i = 0; i < 8; i++) {
+    output += bitPattern(upperBits[i], lowerBits[i]);
+  }
+  return output;
+}
+
 export default class Dissassembler {
+  // startPC starts by default at 0x200 so it appears correctly when outputing to the Terminal/Console
   static decode(rom: Uint8Array, pc: number, startPC: number = 0x200): String {
     const opcode = (rom[pc] << 8) | rom[pc + 1];
 
@@ -11,41 +38,7 @@ export default class Dissassembler {
 
     const kk = `0x${toHexString(opcode & 0xff)}`;
 
-    let bitdiagram = () => {
-      const upperBits = (rom[pc] || '').toString(2).padStart(8, '0');
-      const lowerBits = (rom[pc + 1] || '').toString(2).padStart(8, '0');
-
-      const patternFn = (upperBit: string, lowerBit: string) => {
-        const fullblock = '\u2588';
-        const upperblock = '\u2580';
-        const lowerblock = '\u2584';
-        const space = ' ';
-        const pattern = upperBit + lowerBit;
-        switch (pattern) {
-          case '11':
-            return fullblock;
-          case '10':
-            return upperblock;
-          case '01':
-            return lowerblock;
-          default:
-            return space;
-        }
-      };
-      let output = '';
-      for (let i = 0; i < 8; i++) {
-        output += patternFn(upperBits[i], lowerBits[i]);
-      }
-      return output;
-    };
-
-    // let ascii = bitdiagram();
-
     let output = `${toPaddedHexString(pc + startPC)}:\t ${toHexString(opcode)}\t`;
-    // ${opcode
-    //   .toString(16)
-    //   .padStart(4, '0')
-    //   .toUpperCase()}\t`;
 
     // grab the first nibble for the opcode (4bits)
     switch (opcode & 0xf000) {
@@ -179,7 +172,7 @@ export default class Dissassembler {
     }
 
     output = output.padEnd(30);
-    // output += `\t${ascii}`;
+    // output += `\t${bitDiagram(opcode)}`;
 
     return output;
   }

@@ -14,7 +14,6 @@ class Emulator {
   beep: Beep;
   running: boolean;
   stepCount: number;
-  debuggerElem: HTMLElement;
   debugAddress: number;
   breakpoints: any;
 
@@ -25,7 +24,6 @@ class Emulator {
     this.running = false;
     this.stepCount = -1;
     this.breakpoints = {};
-    this.debuggerElem = document.getElementById('dissasm');
   }
 
   load(buffer: ArrayBuffer) {
@@ -48,7 +46,6 @@ class Emulator {
 
   displayInstructions(pc: number) {
     const memory = this.cpu.getMemory();
-    let output: Array<String> = [];
     const numberOfBytes = 24; // 12 lines
 
     if (
@@ -59,6 +56,7 @@ class Emulator {
       this.debugAddress = pc - 2;
     }
 
+    let output: Array<String> = [];
     for (let i = 0; i < numberOfBytes; i += 2) {
       const decoded = Dissassembler.decode(memory, this.debugAddress + i, 0);
       const matches = decoded.match(/(\w+):\t(.*)/);
@@ -72,7 +70,8 @@ class Emulator {
         }">${addr + instr}</div>`
       ];
     }
-    this.debuggerElem.innerHTML = output.join('');
+    const debuggerElem = document.getElementById('dissasm');
+    debuggerElem.innerHTML = output.join('');
   }
 
   displayRegisters() {
