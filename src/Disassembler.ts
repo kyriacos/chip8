@@ -26,7 +26,7 @@ function bitDiagram(opcode: number): string {
   return output;
 }
 
-export default class Dissassembler {
+export default class Disassembler {
   // startPC starts by default at 0x200 so it appears correctly when outputing to the Terminal/Console
   static decode(rom: Uint8Array, pc: number, startPC: number = 0x200): String {
     const opcode = (rom[pc] << 8) | rom[pc + 1];

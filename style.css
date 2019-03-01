@@ -131,7 +131,7 @@ grid-item {
 #debugger {
   grid-area: debugger;
   display: grid;
-  grid-template-areas: 'dissasm registers';
+  grid-template-areas: 'disasm registers';
   grid-gap: 10px;
   padding: 2px;
   border: 5px solid #666;
@@ -140,8 +140,8 @@ grid-item {
   font-size: 13px;
 }
 
-#dissasm {
-  grid-area: dissasm;
+#disasm {
+  grid-area: disasm;
   background: #333;
 }
 
@@ -164,7 +164,7 @@ grid-item {
   color: #a5a5a5;
 }
 
-#dissasm div {
+#disasm div {
   display: grid;
   grid-template-columns: 10% auto;
   grid-template-areas: 'address instruction';
@@ -172,21 +172,21 @@ grid-item {
   padding: 4px;
 }
 
-#dissasm div.active {
+#disasm div.active {
   background-color: green;
 }
 
-#dissasm pre {
+#disasm pre {
   margin: 0;
   padding: 0;
   font-family: 'Apple 2';
 }
 
-#dissasm div pre:first-child {
+#disasm div pre:first-child {
   grid-area: address;
   color: #a5a5a5;
 }
 
-#dissasm div pre:nth-child(2) {
+#disasm div pre:nth-child(2) {
   grid-area: instruction;
 }

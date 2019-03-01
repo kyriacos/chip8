@@ -19,7 +19,7 @@
     "watch": "rollup -w -c",
     "build": "npm run clean && rollup -c",
     "clean": "rm -rf ./build && mkdir build",
-    "dissasm": "rm -rf build/tools && mkdir -p build/tools && tsc --outDir build tools/dissasm.ts && node build/tools/dissasm.js"
+    "disasm": "rm -rf build/tools && mkdir -p build/tools && tsc --outDir build tools/disasm.ts && node build/tools/disasm.js"
   },
   "keywords": [
     "chip8",

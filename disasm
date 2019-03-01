@@ -1,0 +1,2 @@
+#!/bin/bash
+rm -rf build/tools && mkdir -p build/tools && npx tsc --outDir build tools/disasm.ts && node build/tools/disasm.js $1

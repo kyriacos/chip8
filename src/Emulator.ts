@@ -3,7 +3,7 @@ import Beep from './Beep';
 import CPU from './CPU';
 import CanvasRenderer from './CanvasRenderer';
 import KeyMap from './KeyMap';
-import Dissassembler from './Dissassembler';
+import Disassembler from './Disassembler';
 
 const D_HEIGHT = 32;
 const D_WIDTH = 64;
@@ -58,7 +58,7 @@ class Emulator {
 
     let output: Array<String> = [];
     for (let i = 0; i < numberOfBytes; i += 2) {
-      const decoded = Dissassembler.decode(memory, this.debugAddress + i, 0);
+      const decoded = Disassembler.decode(memory, this.debugAddress + i, 0);
       const matches = decoded.match(/(\w+):\t(.*)/);
       const addr = `<pre>${matches[1] || ''}</pre>`;
       const instr = `<pre>${matches[2] || ''}</pre>`;
@@ -70,7 +70,7 @@ class Emulator {
         }">${addr + instr}</div>`
       ];
     }
-    const debuggerElem = document.getElementById('dissasm');
+    const debuggerElem = document.getElementById('disasm');
     debuggerElem.innerHTML = output.join('');
   }
 

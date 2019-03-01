@@ -1,5 +1,5 @@
 const fs = require('fs');
-import Dissassembler from '../src/Dissassembler';
+import Dissassembler from '../src/Disassembler';
 
 function run() {
   if (!process.argv[2]) {
