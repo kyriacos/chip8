@@ -9,3 +9,4 @@ TODO:
 [X] add disasm
 [] add FPS
 [] static or dynarec
+[] clean up emulator code and remove DOM manipulation

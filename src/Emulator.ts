@@ -89,26 +89,30 @@ class Emulator {
     this.breakpoints[addr.toLowerCase()] = true;
   }
 
+  addBreakpoints() {
+    this.breakpoints = {}; // clear the breakpoints every time in case there are new ones
+    const arr = document.querySelectorAll('#breakpoints .list span.addr');
+    arr.forEach((e: HTMLElement) => {
+      // only add if its at least a valid number in base 16
+      const addr = e.innerText;
+      if (parseInt(addr, 16)) {
+        this.addBreakpoint(addr);
+      }
+    });
+  }
+
   start() {
     this.running = true;
     const run = () => {
-      const addBreakpoints = () => {
-        this.breakpoints = {}; // clear the breakpoints every time in case there are new ones
-        const arr = document.querySelectorAll('#breakpoints .list span.addr');
-        arr.forEach((e: HTMLElement) => {
-          // only add if its at least a valid number in base 16
-          const addr = e.innerText;
-          if (parseInt(addr, 16)) {
-            this.addBreakpoint(addr);
-          }
-        });
-      };
-
       const emulate = (count: number = 10) => {
-        addBreakpoints();
+        this.addBreakpoints();
 
         for (let i = 0; i < count; i++) {
           this.cpu.runCycle();
+          if (this.breakpoints[this.cpu.getPC().toString(16)]) {
+            this.running = false;
+            break;
+          }
         }
 
         this.displayInstructions(this.cpu.getPC());
@@ -130,10 +134,6 @@ class Emulator {
           this.cpu.delayTimer--;
         }
       };
-
-      if (this.breakpoints[this.cpu.getPC().toString(16)]) {
-        this.running = false;
-      }
 
       if (this.isRunning()) {
         emulate();
@@ -225,7 +225,7 @@ function init() {
     (<HTMLElement>evt.target).innerText = emulator.isRunning() ? 'Pause' : 'Play';
   };
 
-  document.getElementById('step').onclick = function(evt) {
+  document.getElementById('step').onclick = function() {
     emulator.step();
     document.getElementById('pause').innerText = 'Play';
   };
