@@ -6,6 +6,7 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "moduleResolution": "node",
     "outDir": "build"
