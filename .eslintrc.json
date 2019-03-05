@@ -1,14 +1,5 @@
 {
   "parser": "@typescript-eslint/parser",
-  "env": {
-    "es6": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module"
-  },
-  "plugins": ["prettier", "number-literal-case"],
-  "rules": {
-    "number-literal-case/number-literal-case": ["error"]
-  }
+  "plugins": ["prettier"],
+  "extends": ["plugin:eslint-plugin-number-literal-case/recommended"]
 }

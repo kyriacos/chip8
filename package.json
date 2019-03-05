@@ -3,14 +3,13 @@
   "version": "0.0.1",
   "description": "Chip8 Interpreter in Typescript",
   "main": "chip8.js",
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^11.9.4",
     "@typescript-eslint/eslint-plugin": "^1.4.0",
     "@typescript-eslint/parser": "^1.4.0",
     "eslint": "^5.14.1",
     "eslint-config-prettier": "^4.0.0",
-    "eslint-plugin-number-literal-case": "file:eslint-plugin-number-literal-case",
+    "eslint-plugin-number-literal-case": "^1.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "rollup-plugin-typescript2": "^0.19.3",
     "typescript": "^3.3.3333"
