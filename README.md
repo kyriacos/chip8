@@ -1,4 +1,4 @@
-Still working through the project. A better README is in my TODOs :)
+*Update: Paused work on this project. And haven't really finished the README and article. Finally making it public though rather than keeping private even longer (>10 months - ouch).*
 
 #### TODO
 
